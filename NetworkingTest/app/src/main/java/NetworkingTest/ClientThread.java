@@ -51,7 +51,7 @@ public class ClientThread extends Thread {
                         while(true) {
                             try {
                                 Object inObj = oIn.readObject();
-                                String inStr;
+                                String inStr = null;
                                 
                                 if(inObj instanceof String)  {
                                     System.out.println("HMM: " + inObj.getClass().getName());
@@ -63,7 +63,7 @@ public class ClientThread extends Thread {
                                 }
                                  
                                  //response = input.readLine();
-                                 if(inStr) {
+                                 if(!inStr.equals(null)) {
                                      updateTextbox(inStr);
                                  }
                                  
