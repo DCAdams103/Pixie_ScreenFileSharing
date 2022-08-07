@@ -63,7 +63,7 @@ public class ClientThread extends Thread {
                                 }
                                  
                                  //response = input.readLine();
-                                 if(!inStr.equals(null)) {
+                                 if(inStr != null) {
                                      updateTextbox(inStr);
                                  }
                                  
@@ -137,7 +137,12 @@ public class ClientThread extends Thread {
             
             ImageIcon imgIcon = new ImageIcon(data);
             Image img = imgIcon.getImage();
-            Image newImg = img.getScaledInstance(120, 120, java.awt.Image.SCALE_SMOOTH);
+            
+            int img_width = img.getWidth(chatTextPane);
+            int img_height = img.getHeight(chatTextPane);
+            double ratio = 16.0 * img_width / img_height;
+            
+            Image newImg = img.getScaledInstance((int)(img_width/ratio), (int)(img_height/ratio), java.awt.Image.SCALE_SMOOTH);
             chatTextPane.getDocument().insertString(chatTextPane.getDocument().getLength(), "\n", null);
             chatTextPane.setSelectionStart(chatTextPane.getDocument().getLength());
             chatTextPane.insertIcon(new ImageIcon(newImg));
