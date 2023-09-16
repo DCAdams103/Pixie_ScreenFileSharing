@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.io.*;
 import javax.swing.ImageIcon;
+import javax.swing.text.BadLocationException;
 
 public class ClientThread extends Thread {
 
@@ -37,24 +38,24 @@ public class ClientThread extends Thread {
     public void run() {
         
             Thread msgRec = new Thread(new Runnable() {
-                
-                String response;
+            
                 @Override
                 public void run() {
-                    
+
                     try {
-                        
+
                         oIn = new ObjectInputStream(socket.getInputStream());
-                        //oOut = new ObjectOutputStream(socket.getOutputStream());
-                        
+
                         while(true) {
-                            
+
                             Object inObj = oIn.readObject();
                             String inStr = null;
-
+                            
                             if(inObj instanceof String)  {
+                                // If incoming data is a String
                                 inStr = (String)inObj;
                             } else if (inObj instanceof byte[]) {
+                                // If incoming data is a byte[] (as for right now that means an image)
                                 updatePaneWithImage((byte[])inObj);
                             } else {
                                 inStr = "Error";
@@ -69,24 +70,14 @@ public class ClientThread extends Thread {
                         System.out.println("Error in ClientThread1: ");
                         e.printStackTrace();
                     }
-                    
-                }
-            
-            });
-            
-            msgRec.start();
-            
-    }
-    
-    public void sendMsg(String msg, String user, String opt) {
 
-        try {
-            oOut.writeObject(user + opt + ": " + msg);
-        } catch (Exception e) {
-            System.out.println("Error in ClientThread1 sendMsg: ");
-            e.printStackTrace();
-        }
+                }
+
+        });
         
+        // Start the thread to listen for incoming messsages
+        msgRec.start();
+            
     }
     
     public void setMsg(String msg) {
@@ -120,19 +111,17 @@ public class ClientThread extends Thread {
             ImageIcon imgIcon = new ImageIcon(data);
             Image img = imgIcon.getImage();
             
+            // Create size of image
             int img_width = img.getWidth(chatTextPane);
             int img_height = img.getHeight(chatTextPane);
             double ratio = 16.0 * img_width / img_height;
-            
-            //oOut.writeObject(this.userName + " sent a file:");
-            chatTextPane.getDocument().insertString(chatTextPane.getDocument().getLength(), "\n" + this.userName + " sent a file: ", null);
             
             Image newImg = img.getScaledInstance((int)(img_width/ratio), (int)(img_height/ratio), java.awt.Image.SCALE_SMOOTH);
             chatTextPane.getDocument().insertString(chatTextPane.getDocument().getLength(), "\n", null);
             chatTextPane.setSelectionStart(chatTextPane.getDocument().getLength());
             chatTextPane.insertIcon(new ImageIcon(newImg));
             
-        } catch (Exception e) {
+        } catch (BadLocationException e) {
             System.out.println("Error in ClientThread1 updatePaneWithImage: ");
             e.printStackTrace();
         }

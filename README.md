@@ -10,12 +10,12 @@ Login screen
 ![Login Screen](./Screenshots/Login.jpg)
 <br>
 
-First Client connects
+Both Clients connect
 <br><br>
 ![Dylan connects to server](./Screenshots/Chat1.jpg)
 <br>
 
-First Client sends a chat and an image
+Clients communicate with text and images
 <br><br>
 ![First Client sends a chat and an image](./Screenshots/Chat2.jpg)
 <br>

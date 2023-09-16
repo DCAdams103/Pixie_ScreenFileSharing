@@ -4,36 +4,19 @@ package PixieScreenShare;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
-import java.awt.AWTException;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 
-/**
- *
- * @author Test Account
- */
 public class ChatFrame extends javax.swing.JFrame {
 
     static String userName;
@@ -45,9 +28,7 @@ public class ChatFrame extends javax.swing.JFrame {
     ClientThread clientThread;
     boolean sharing = false;
     
-    /**
-     * Creates new form ChatFrame
-     */
+    // Creates new form ChatFrame
     public ChatFrame() {
         initComponents();
     }
@@ -86,7 +67,6 @@ public class ChatFrame extends javax.swing.JFrame {
         attachButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         chatTextPane = new javax.swing.JTextPane();
-        share = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -115,13 +95,6 @@ public class ChatFrame extends javax.swing.JFrame {
 
         jScrollPane2.setViewportView(chatTextPane);
 
-        share.setText("Share");
-        share.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shareActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -141,10 +114,9 @@ public class ChatFrame extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(msgTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(sendButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(attachButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(share, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
+                                    .addComponent(attachButton))))))
                 .addGap(193, 193, 193))
         );
         layout.setVerticalGroup(
@@ -162,10 +134,8 @@ public class ChatFrame extends javax.swing.JFrame {
                         .addComponent(sendButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(attachButton))
-                    .addComponent(msgTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(share)
-                .addGap(21, 21, 21))
+                    .addComponent(msgTextField))
+                .addGap(54, 54, 54))
         );
 
         pack();
@@ -181,30 +151,17 @@ public class ChatFrame extends javax.swing.JFrame {
         });
         
         try {
-            System.out.println("create");
             Socket socket = new Socket("localhost", 5000);
-            System.out.println("created");
-            
-            // Input from server
-            //BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
             setOOut(objOut);
             
             clientThread = new ClientThread(socket, chatTextPane, userName, output, oOut, this);
-            
             clientThread.start();
             
+            // Send to all clients
             objOut.writeObject(userName + " connected.");
             objOut.flush();
-            
-            //startReading(input);
-            //startWriting(socket, output);
-            
-//            while(!text.equals("Exit")) {
-//                text = input.readLine();
-//                msgTextField.setText(msgTextField.getText() + "\n" + userName + ": " + text);
-//            }
 
         } catch (Exception e) {
             System.out.println("Error in connection: ");
@@ -212,27 +169,6 @@ public class ChatFrame extends javax.swing.JFrame {
         }
     }
     
-    public void startReading(BufferedReader bf) {
-        Runnable r1 = () -> {
-            System.out.println("Reader Started...");
-            
-            try {
-                while(true) {
-                    
-                    String msg = bf.readLine();
-                    //updateTextbox(msg);
-                    
-                }
-            } catch(Exception e) {
-                System.out.println("Error in startReading: ");
-                e.printStackTrace();
-            }
-            
-        };
-        
-        new Thread(r1).start();
-        
-    }
     
     public String getInput() {
         return text;
@@ -243,16 +179,13 @@ public class ChatFrame extends javax.swing.JFrame {
     }
     
     private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendButtonActionPerformed
-          //this.clientThread.setMsg(msgTextField.getText());
-          this.clientThread.sendMsg(msgTextField.getText(), userName, "");
           
-//          setInput(msgTextField.getText());
-//          PrintWriter output = getPW();
-//          output.println(userName + ": " + getInput());
-//          output.flush();
-
-          msgTextField.setText("");
-        
+        try {
+            oOut.writeObject(userName + ": " + msgTextField.getText());
+            msgTextField.setText("");
+        } catch (IOException ex) {
+            Logger.getLogger(ChatFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_sendButtonActionPerformed
 
     private void msgTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msgTextFieldActionPerformed
@@ -262,14 +195,21 @@ public class ChatFrame extends javax.swing.JFrame {
     private void attachButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attachButtonActionPerformed
         
         try {
+            
+            // Prompt the user to choose a file
             JFileChooser fc = jFileChooser1;
-        
+            
+            // Don't give the dialog a parent
             int returnVal = fc.showOpenDialog(null);
+            
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
 
+                // Send the byte data to clients
                 byte[] content = Files.readAllBytes(file.toPath());
+                oOut.writeObject(userName + " sent a file: " + msgTextField.getText());
                 oOut.writeObject(content);
+                
             }
             
         } catch (Exception e) {
@@ -278,17 +218,8 @@ public class ChatFrame extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_attachButtonActionPerformed
-
-    private void shareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shareActionPerformed
-        
-        sharing = !sharing;
-        
-        ScreenShare ss = new ScreenShare(sharing);
-        
-        
-        
-    }//GEN-LAST:event_shareActionPerformed
     
+    /*    */
     
     
     /**
@@ -337,7 +268,6 @@ public class ChatFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private static javax.swing.JTextField msgTextField;
     private javax.swing.JButton sendButton;
-    private javax.swing.JButton share;
     private javax.swing.JLabel userNameLabel;
     // End of variables declaration//GEN-END:variables
 }

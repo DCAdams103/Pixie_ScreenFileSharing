@@ -17,7 +17,15 @@ import javax.imageio.ImageIO;
 
 /**
  *
- * @author Dylan Adams
+ * 
+ * 
+ * 
+ * 
+ * Work in progress
+ * 
+ * 
+ * 
+ * 
  */
 public class ScreenShare extends Thread{
     
@@ -28,9 +36,6 @@ public class ScreenShare extends Thread{
     }
     
     private static double[][] comparePixelMap(double[][] old){
-        
-        
-        
         return new double[1][1];
     }
     
